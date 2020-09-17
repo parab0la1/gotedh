@@ -1,26 +1,30 @@
 package com.parab0la.gotedh.model;
 
+import com.parab0la.gotedh.util.StringListConverter;
+
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
-@Table(name = "decks")
-public class Deck {
+@Table(name = "users")
+public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
-    private String commander;
+
+    private String name;
     private Integer eloRanking;
-    private Integer eloChangePerGame;
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    private String owner;
-
+    @Convert(converter = StringListConverter.class)
+    private List<String> userDecks;
 
     public Integer getId() {
         return id;
@@ -30,12 +34,12 @@ public class Deck {
         this.id = id;
     }
 
-    public String getCommander() {
-        return commander;
+    public String getName() {
+        return name;
     }
 
-    public void setCommander(String commander) {
-        this.commander = commander;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getEloRanking() {
@@ -44,14 +48,6 @@ public class Deck {
 
     public void setEloRanking(Integer eloRanking) {
         this.eloRanking = eloRanking;
-    }
-
-    public Integer getEloChangePerGame() {
-        return eloChangePerGame;
-    }
-
-    public void setEloChangePerGame(Integer eloChangePerGame) {
-        this.eloChangePerGame = eloChangePerGame;
     }
 
     public Integer getGamesPlayed() {
@@ -78,11 +74,11 @@ public class Deck {
         this.oppsWinPercent = oppsWinPercent;
     }
 
-    public String getOwner() {
-        return owner;
+    public List<String> getUserDecks() {
+        return userDecks;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setUserDecks(List<String> userDecks) {
+        this.userDecks = userDecks;
     }
 }

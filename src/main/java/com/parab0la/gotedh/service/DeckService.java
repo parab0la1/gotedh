@@ -19,7 +19,6 @@ public class DeckService {
     }
 
     public Optional<Deck> getDeck(Integer deckId) {
-
         return deckRepository.findById(deckId);
     }
 
@@ -31,7 +30,7 @@ public class DeckService {
         Optional<Deck> optDeckToUpdate = deckRepository.findById(deckid);
 
         if (optDeckToUpdate.isPresent()) {
-            optDeckToUpdate.get().setName(deck.getName());
+            optDeckToUpdate.get().setCommander(deck.getCommander());
             deckRepository.save(optDeckToUpdate.get());
 
             return optDeckToUpdate.get();

@@ -31,9 +31,9 @@ public class DeckController {
         return deckService.createDeck(deck);
     }
 
-    @GetMapping(path = "/{deckId}")
-    public Deck getDeck(@PathVariable Integer deckId) {
-        Optional<Deck> optDeck = deckService.getDeck(deckId);
+    @GetMapping(path = "/{id}")
+    public Deck getDeck(@PathVariable Integer id) {
+        Optional<Deck> optDeck = deckService.getDeck(id);
 
         return optDeck.orElse(null);
     }
@@ -43,19 +43,19 @@ public class DeckController {
         return deckService.getDecks();
     }
 
-    @PutMapping(path = "/{deckId}")
-    public ResponseEntity<Deck> updateDeck(@PathVariable Integer deckId, @RequestBody Deck deck) {
-        Deck updatedDeck = deckService.updateDeck(deckId, deck);
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Deck> updateDeck(@PathVariable Integer id, @RequestBody Deck deck) {
+        Deck updatedDeck = deckService.updateDeck(id, deck);
 
         return updatedDeck != null ?
                 new ResponseEntity<>(updatedDeck, HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping(path = "/{deckId}")
-    public ResponseEntity<Deck> deleteDeck(@PathVariable Integer deckId) {
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Deck> deleteDeck(@PathVariable Integer id) {
         try {
-            deckService.deleteDeck(deckId);
+            deckService.deleteDeck(id);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
