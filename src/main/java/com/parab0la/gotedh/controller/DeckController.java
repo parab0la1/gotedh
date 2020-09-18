@@ -33,8 +33,8 @@ public class DeckController {
     }
 
     @GetMapping
-    public Iterable<Deck> getDecks() {
-        return deckService.getDecks();
+    public ResponseEntity<Iterable<Deck>> getDecks() {
+        return new ResponseEntity<>(deckService.getDecks(), HttpStatus.OK);
     }
 
     @PutMapping(path = "/{id}")

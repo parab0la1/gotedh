@@ -1,22 +1,10 @@
-package com.parab0la.gotedh.model;
+package com.parab0la.gotedh.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.parab0la.gotedh.model.Deck;
+import com.parab0la.gotedh.model.User;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+public class DeckDTO {
 
-@Entity
-@Table(name = "decks")
-public class Deck {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long deckId;
     private String commander;
     private Integer eloRanking;
@@ -24,33 +12,28 @@ public class Deck {
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
     private User owner;
 
-    public Deck() {
+    public DeckDTO() {
     }
 
-    public Deck(Long deckId, String commander, Integer eloRanking,
-                Integer eloChangePerGame, Integer gamesPlayed,
-                Integer gamesWinPercent, Integer oppsWinPercent, User owner) {
-        this.deckId = deckId;
-        this.commander = commander;
-        this.eloRanking = eloRanking;
-        this.eloChangePerGame = eloChangePerGame;
-        this.gamesPlayed = gamesPlayed;
-        this.gamesWinPercent = gamesWinPercent;
-        this.oppsWinPercent = oppsWinPercent;
-        this.owner = owner;
+    public DeckDTO(Deck deck) {
+        this.deckId = deck.getDeckId();
+        this.commander = deck.getCommander();
+        this.eloRanking = deck.getEloRanking();
+        this.eloChangePerGame = deck.getEloChangePerGame();
+        this.gamesPlayed = deck.getGamesPlayed();
+        this.gamesWinPercent = deck.getGamesWinPercent();
+        this.oppsWinPercent = deck.getOppsWinPercent();
+        this.owner = deck.getOwner();
     }
 
     public Long getDeckId() {
         return deckId;
     }
 
-    public void setDeckId(Long id) {
-        this.deckId = id;
+    public void setDeckId(Long deckId) {
+        this.deckId = deckId;
     }
 
     public String getCommander() {

@@ -1,54 +1,39 @@
-package com.parab0la.gotedh.model;
+package com.parab0la.gotedh.dto;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.parab0la.gotedh.model.Deck;
+import com.parab0la.gotedh.model.User;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.util.Set;
 
-@Entity
-@Table(name = "users")
-public class User {
+public class UserDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
-
     private String name;
     private Integer eloRanking;
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    @JsonManagedReference
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<Deck> decks;
 
-    public User() {
+    public UserDTO() {
     }
 
-    public User(Long userId, String name, Integer eloRanking,
-                Integer gamesPlayed, Integer gamesWinPercent,
-                Integer oppsWinPercent, Set<Deck> decks) {
-        this.userId = userId;
-        this.name = name;
-        this.eloRanking = eloRanking;
-        this.gamesPlayed = gamesPlayed;
-        this.gamesWinPercent = gamesWinPercent;
-        this.oppsWinPercent = oppsWinPercent;
-        this.decks = decks;
+    public UserDTO(User user) {
+        this.userId = user.getUserId();
+        this.name = user.getName();
+        this.eloRanking = user.getEloRanking();
+        this.gamesPlayed = user.getGamesPlayed();
+        this.gamesWinPercent = user.getGamesWinPercent();
+        this.oppsWinPercent = user.getOppsWinPercent();
+        this.decks = user.getDecks();
     }
 
     public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Long id) {
-        this.userId = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getName() {
