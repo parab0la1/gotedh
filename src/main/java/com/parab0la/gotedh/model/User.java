@@ -1,37 +1,40 @@
 package com.parab0la.gotedh.model;
 
-import com.parab0la.gotedh.util.StringListConverter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import javax.persistence.Convert;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long userId;
 
     private String name;
     private Integer eloRanking;
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    @Convert(converter = StringListConverter.class)
-    private List<String> userDecks;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private Set<Deck> decks;
 
-    public Integer getId() {
-        return id;
+
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setUserId(Long id) {
+        this.userId = id;
     }
 
     public String getName() {
@@ -74,11 +77,11 @@ public class User {
         this.oppsWinPercent = oppsWinPercent;
     }
 
-    public List<String> getUserDecks() {
-        return userDecks;
+    public Set<Deck> getDecks() {
+        return decks;
     }
 
-    public void setUserDecks(List<String> userDecks) {
-        this.userDecks = userDecks;
+    public void setDecks(Set<Deck> decks) {
+        this.decks = decks;
     }
 }

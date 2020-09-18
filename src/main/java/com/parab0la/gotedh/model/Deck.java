@@ -1,9 +1,14 @@
 package com.parab0la.gotedh.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -11,23 +16,26 @@ import javax.persistence.Table;
 public class Deck {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long deckId;
     private String commander;
     private Integer eloRanking;
     private Integer eloChangePerGame;
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    private String owner;
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User owner;
 
 
-    public Integer getId() {
-        return id;
+    public Long getDeckId() {
+        return deckId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setDeckId(Long id) {
+        this.deckId = id;
     }
 
     public String getCommander() {
@@ -78,11 +86,11 @@ public class Deck {
         this.oppsWinPercent = oppsWinPercent;
     }
 
-    public String getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 }

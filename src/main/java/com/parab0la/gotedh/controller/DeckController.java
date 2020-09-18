@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,16 +25,11 @@ public class DeckController {
         this.deckService = deckService;
     }
 
-    @PostMapping
-    public Deck createDeck(@RequestBody Deck deck) {
-        return deckService.createDeck(deck);
-    }
-
     @GetMapping(path = "/{id}")
-    public Deck getDeck(@PathVariable Integer id) {
+    public ResponseEntity<Deck> getDeck(@PathVariable Long id) {
         Optional<Deck> optDeck = deckService.getDeck(id);
 
-        return optDeck.orElse(null);
+        return optDeck.map(deck -> new ResponseEntity<>(deck, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping
@@ -44,7 +38,7 @@ public class DeckController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<Deck> updateDeck(@PathVariable Integer id, @RequestBody Deck deck) {
+    public ResponseEntity<Deck> updateDeck(@PathVariable Long id, @RequestBody Deck deck) {
         Deck updatedDeck = deckService.updateDeck(id, deck);
 
         return updatedDeck != null ?
@@ -53,7 +47,7 @@ public class DeckController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Deck> deleteDeck(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteDeck(@PathVariable Long id) {
         try {
             deckService.deleteDeck(id);
         } catch (EntityNotFoundException e) {
