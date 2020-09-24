@@ -1,11 +1,14 @@
 package com.parab0la.gotedh.service;
 
+import com.parab0la.gotedh.exception.UserNotFoundException;
 import com.parab0la.gotedh.model.User;
 import com.parab0la.gotedh.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class UserService {
@@ -24,28 +27,33 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Iterable<User> getUsers() {
-        return userRepository.findAll();
+    public List<User> getUsers() {
+        return StreamSupport.stream(userRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
-    public User updateUser(Long id, User user) {
-        Optional<User> userToUpdate = userRepository.findById(id);
+    public User updateUser(Long userId, User newUser) {
+        Optional<User> userToUpdate = userRepository.findById(userId);
 
-        if (userToUpdate.isPresent()) {
-            userToUpdate.get().setName(user.getName());
-            userRepository.save(userToUpdate.get());
+        if (!userToUpdate.isPresent())
+            throw new UserNotFoundException(userId);
 
-            return userToUpdate.get();
-        }
-
-        return null;
+        return userRepository.save(updateUser(userToUpdate.get(), newUser));
     }
 
-    public void deleteUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-        } else {
-            throw new EntityNotFoundException();
-        }
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId))
+            throw new UserNotFoundException(userId);
+
+        userRepository.deleteById(userId);
+    }
+
+    private User updateUser(User userToUpdate, User newUser) {
+        userToUpdate.setName(newUser.getName());
+        userToUpdate.setEloRanking(newUser.getEloRanking());
+        userToUpdate.setGamesPlayed(newUser.getGamesPlayed());
+        userToUpdate.setGamesWinPercent(newUser.getGamesWinPercent());
+        userToUpdate.setOppsWinPercent(newUser.getOppsWinPercent());
+
+        return userToUpdate;
     }
 }

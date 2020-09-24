@@ -1,8 +1,13 @@
 package com.parab0la.gotedh.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.parab0la.gotedh.model.Deck;
-import com.parab0la.gotedh.model.User;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeckDTO {
 
     private Long deckId;
@@ -12,10 +17,11 @@ public class DeckDTO {
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    private User owner;
+    private UserDTO owner;
 
     public DeckDTO() {
     }
+
 
     public DeckDTO(Deck deck) {
         this.deckId = deck.getDeckId();
@@ -25,7 +31,12 @@ public class DeckDTO {
         this.gamesPlayed = deck.getGamesPlayed();
         this.gamesWinPercent = deck.getGamesWinPercent();
         this.oppsWinPercent = deck.getOppsWinPercent();
-        this.owner = deck.getOwner();
+
+        deck.getOwner().setDecks(null);
+        if (deck.getOwner() != null) {
+            this.owner = new UserDTO(deck.getOwner());
+        }
+
     }
 
     public Long getDeckId() {
@@ -84,11 +95,35 @@ public class DeckDTO {
         this.oppsWinPercent = oppsWinPercent;
     }
 
-    public User getOwner() {
+    public UserDTO getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
+    public void setOwner(UserDTO owner) {
         this.owner = owner;
+    }
+
+    public static List<DeckDTO> toDeckDTOs(List<Deck> decks) {
+        return decks.stream().map(deck -> new DeckDTO(deck)).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeckDTO deckDTO = (DeckDTO) o;
+        return Objects.equals(getDeckId(), deckDTO.getDeckId()) &&
+                Objects.equals(getCommander(), deckDTO.getCommander()) &&
+                Objects.equals(getEloRanking(), deckDTO.getEloRanking()) &&
+                Objects.equals(getEloChangePerGame(), deckDTO.getEloChangePerGame()) &&
+                Objects.equals(getGamesPlayed(), deckDTO.getGamesPlayed()) &&
+                Objects.equals(getGamesWinPercent(), deckDTO.getGamesWinPercent()) &&
+                Objects.equals(getOppsWinPercent(), deckDTO.getOppsWinPercent()) &&
+                Objects.equals(getOwner(), deckDTO.getOwner());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDeckId(), getCommander(), getEloRanking(), getEloChangePerGame(), getGamesPlayed(), getGamesWinPercent(), getOppsWinPercent(), getOwner());
     }
 }

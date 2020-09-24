@@ -1,10 +1,14 @@
 package com.parab0la.gotedh.dto;
 
-import com.parab0la.gotedh.model.Deck;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.parab0la.gotedh.model.User;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
 
     private Long userId;
@@ -13,7 +17,7 @@ public class UserDTO {
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    private Set<Deck> decks;
+    private List<DeckDTO> decks;
 
     public UserDTO() {
     }
@@ -25,7 +29,10 @@ public class UserDTO {
         this.gamesPlayed = user.getGamesPlayed();
         this.gamesWinPercent = user.getGamesWinPercent();
         this.oppsWinPercent = user.getOppsWinPercent();
-        this.decks = user.getDecks();
+
+        if (user.getDecks() != null) {
+            this.decks = DeckDTO.toDeckDTOs(new ArrayList<>(user.getDecks()));
+        }
     }
 
     public Long getUserId() {
@@ -76,11 +83,33 @@ public class UserDTO {
         this.oppsWinPercent = oppsWinPercent;
     }
 
-    public Set<Deck> getDecks() {
+    public List<DeckDTO> getDecks() {
         return decks;
     }
 
-    public void setDecks(Set<Deck> decks) {
+    public void setDecks(List<DeckDTO> decks) {
         this.decks = decks;
+    }
+
+    public static List<UserDTO> toUserDTOs(List<User> users) {
+        return users.stream().map(user -> new UserDTO(user)).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserDTO userDTO = (UserDTO) o;
+        return Objects.equals(getUserId(), userDTO.getUserId()) &&
+                Objects.equals(getName(), userDTO.getName()) &&
+                Objects.equals(getEloRanking(), userDTO.getEloRanking()) &&
+                Objects.equals(getGamesPlayed(), userDTO.getGamesPlayed()) &&
+                Objects.equals(getGamesWinPercent(), userDTO.getGamesWinPercent()) &&
+                Objects.equals(getOppsWinPercent(), userDTO.getOppsWinPercent());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUserId(), getName(), getEloRanking(), getGamesPlayed(), getGamesWinPercent(), getOppsWinPercent());
     }
 }

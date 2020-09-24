@@ -2,11 +2,15 @@ package com.parab0la.gotedh.service;
 
 import com.parab0la.gotedh.exception.UserNotFoundException;
 import com.parab0la.gotedh.model.Deck;
+import com.parab0la.gotedh.model.User;
 import com.parab0la.gotedh.repository.DeckRepository;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class DeckService {
@@ -34,29 +38,59 @@ public class DeckService {
         return deckRepository.findById(id);
     }
 
-    public Iterable<Deck> getDecks() {
-        return deckRepository.findAll();
-    }
+    public Deck getUserDeck(Long userId, Long deckId) {
+        Optional<User> owner = userService.getUser(userId);
 
-    public Deck updateDeck(Long id, Deck deck) {
-        Optional<Deck> deckToUpdate = deckRepository.findById(id);
-
-        if (deckToUpdate.isPresent()) {
-            deckToUpdate.get().setCommander(deck.getCommander());
-            deckRepository.save(deckToUpdate.get());
-
-            return deckToUpdate.get();
+        if (owner.isPresent()) {
+            return deckRepository.findByDeckIdAndOwner(deckId, owner.get()).orElseThrow(() -> new UserNotFoundException(userId));
         }
 
-        return null;
+        throw new UserNotFoundException(userId);
     }
 
-    public void deleteDeck(Long id) {
-        if (deckRepository.existsById(id)) {
-            deckRepository.deleteById(id);
+    public List<Deck> getUserDecks(Long userId) {
+        Optional<User> owner = userService.getUser(userId);
+
+        if (owner.isPresent()) {
+            return deckRepository.findByOwner(owner.get());
+        }
+
+        throw new UserNotFoundException(userId);
+    }
+
+    public List<Deck> getDecks() {
+        return StreamSupport.stream(deckRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    }
+
+    public Deck updateDeck(Long userId, Long deckId, Deck newDeck) {
+        if (userService.getUser(userId).isPresent()) {
+            return deckRepository.findById(deckId)
+                    .map(deckToUpdate -> deckRepository.save(updateRankings(deckToUpdate, newDeck)))
+                    .orElse(null);
+        }
+
+        throw new UserNotFoundException(userId);
+    }
+
+    public void deleteDeck(Long userId, Long deckId) {
+        if (!userService.getUser(userId).isPresent()) {
+            throw new UserNotFoundException(userId);
+        }
+
+        if (deckRepository.existsById(deckId)) {
+            deckRepository.deleteById(deckId);
         } else {
             throw new EntityNotFoundException();
         }
     }
 
+    private Deck updateRankings(Deck deckToUpdate, Deck newDeck) {
+        deckToUpdate.setEloRanking(newDeck.getEloRanking());
+        deckToUpdate.setEloChangePerGame(newDeck.getEloChangePerGame());
+        deckToUpdate.setGamesPlayed(newDeck.getGamesPlayed());
+        deckToUpdate.setGamesWinPercent(newDeck.getGamesWinPercent());
+        deckToUpdate.setOppsWinPercent(newDeck.getOppsWinPercent());
+
+        return deckToUpdate;
+    }
 }

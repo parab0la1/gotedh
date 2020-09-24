@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -26,7 +27,7 @@ public class User {
     private Integer oppsWinPercent;
     @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private Set<Deck> decks;
+    private Set<Deck> decks = new HashSet<>();
 
     public User() {
     }
