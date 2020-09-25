@@ -1,12 +1,13 @@
 package com.parab0la.gotedh.service;
 
-import com.parab0la.gotedh.exception.UserNotFoundException;
+import com.parab0la.gotedh.exception.DeckNotFoundException;
 import com.parab0la.gotedh.model.Deck;
 import com.parab0la.gotedh.model.User;
 import com.parab0la.gotedh.repository.DeckRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class DeckService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeckService.class);
 
     private final DeckRepository deckRepository;
     private final UserService userService;
@@ -23,68 +26,66 @@ public class DeckService {
         this.userService = userService;
     }
 
-    public Deck createDeck(Long id, Deck deck) {
-        userService.getUser(id)
-                .map(user -> {
-                    deck.setOwner(user);
-                    return deckRepository.save(deck);
-                })
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public Deck createDeck(Long userId, Deck deck) {
+        User owner = userService.getUser(userId);
 
-        return null;
+        logger.debug("Saving deck: {} with the owner: {} with id: {}",
+                deck.getCommander(), owner.getName(), owner.getUserId());
+
+        deck.setOwner(owner);
+
+        return deckRepository.save(deck);
     }
 
-    public Optional<Deck> getDeck(Long id) {
-        return deckRepository.findById(id);
+    public Deck getDeck(Long deckId) {
+        logger.debug("Getting deck with id: {}", deckId);
+
+        return deckRepository.findById(deckId).orElseThrow(() -> new DeckNotFoundException(deckId));
     }
 
     public Deck getUserDeck(Long userId, Long deckId) {
-        Optional<User> owner = userService.getUser(userId);
+        logger.debug("Getting deck with id: {} for the user with id: {}", deckId, userId);
 
-        if (owner.isPresent()) {
-            return deckRepository.findByDeckIdAndOwner(deckId, owner.get()).orElseThrow(() -> new UserNotFoundException(userId));
-        }
-
-        throw new UserNotFoundException(userId);
+        return deckRepository.findByDeckIdAndOwner(deckId, userService.getUser(userId))
+                .orElseThrow(() -> new DeckNotFoundException(deckId));
     }
 
-    public List<Deck> getUserDecks(Long userId) {
-        Optional<User> owner = userService.getUser(userId);
+    public List<Deck> getDecks(Long userId) {
+        logger.debug("Getting all decks for a user with id: {}", userId);
 
-        if (owner.isPresent()) {
-            return deckRepository.findByOwner(owner.get());
-        }
-
-        throw new UserNotFoundException(userId);
+        return deckRepository.findByOwner(userService.getUser(userId));
     }
 
     public List<Deck> getDecks() {
+        logger.debug("Getting all decks");
+
         return StreamSupport.stream(deckRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     public Deck updateDeck(Long userId, Long deckId, Deck newDeck) {
-        if (userService.getUser(userId).isPresent()) {
-            return deckRepository.findById(deckId)
-                    .map(deckToUpdate -> deckRepository.save(updateRankings(deckToUpdate, newDeck)))
-                    .orElse(null);
-        }
+        logger.debug("Updating deck with id: {} for user: {} with the new deck: {}", deckId, userId, newDeck);
 
-        throw new UserNotFoundException(userId);
+        Optional<Deck> optDeck = deckRepository.findByDeckIdAndOwner(deckId, userService.getUser(userId));
+
+        return optDeck
+                .map(deckToUpdate -> deckRepository.save(updateRankings(deckToUpdate, newDeck)))
+                .orElseThrow(() -> new DeckNotFoundException(deckId));
     }
 
     public void deleteDeck(Long userId, Long deckId) {
-        if (!userService.getUser(userId).isPresent()) {
-            throw new UserNotFoundException(userId);
-        }
+        logger.debug("Deleting deck with id: {} for user with id: {}", deckId, userId);
 
-        if (deckRepository.existsById(deckId)) {
+        if (deckRepository.findByDeckIdAndOwner(deckId, userService.getUser(userId)).isPresent()) {
+            logger.debug("Found a deck with id: {} for the user with id: {}", deckId, userId);
             deckRepository.deleteById(deckId);
         } else {
-            throw new EntityNotFoundException();
+            logger.error("Did not find a deck with id: {} for the user with id: {}", deckId, userId);
         }
     }
 
     private Deck updateRankings(Deck deckToUpdate, Deck newDeck) {
+        logger.debug("Updating the following values before saving deck: {}", newDeck);
+
         deckToUpdate.setEloRanking(newDeck.getEloRanking());
         deckToUpdate.setEloChangePerGame(newDeck.getEloChangePerGame());
         deckToUpdate.setGamesPlayed(newDeck.getGamesPlayed());

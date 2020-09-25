@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -98,5 +99,37 @@ public class User {
 
     public void setDecks(Set<Deck> decks) {
         this.decks = decks;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(getUserId(), user.getUserId()) &&
+                Objects.equals(getName(), user.getName()) &&
+                Objects.equals(getEloRanking(), user.getEloRanking()) &&
+                Objects.equals(getGamesPlayed(), user.getGamesPlayed()) &&
+                Objects.equals(getGamesWinPercent(), user.getGamesWinPercent()) &&
+                Objects.equals(getOppsWinPercent(), user.getOppsWinPercent()) &&
+                Objects.equals(getDecks(), user.getDecks());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUserId(), getName(), getEloRanking(), getGamesPlayed(), getGamesWinPercent(), getOppsWinPercent(), getDecks());
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", name='" + name + '\'' +
+                ", eloRanking=" + eloRanking +
+                ", gamesPlayed=" + gamesPlayed +
+                ", gamesWinPercent=" + gamesWinPercent +
+                ", oppsWinPercent=" + oppsWinPercent +
+                ", decks=" + decks +
+                '}';
     }
 }

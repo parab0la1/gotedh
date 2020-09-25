@@ -1,5 +1,6 @@
 package com.parab0la.gotedh.controller;
 
+import com.parab0la.gotedh.TestRoot;
 import com.parab0la.gotedh.dto.DeckDTO;
 import com.parab0la.gotedh.exception.DeckNotFoundException;
 import com.parab0la.gotedh.exception.UserNotFoundException;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,27 +34,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)
-class DeckControllerTest {
+class DeckControllerTest extends TestRoot {
 
     @InjectMocks
     DeckController deckController;
 
     @Mock
     private DeckService deckService;
-
-    private List<Deck> decks;
-    private Deck deck;
-    private Deck deckTwo;
-    private Deck deckThree;
-    private User user;
-    private final String KALAMAX = "Kalamax";
-    private final String ANJE = "Anje";
-    private final String KENRITH = "Kenrith";
-    private final Long PHONY_USER_ID = 457L;
-    private final Long USER_ID = 1L;
-    private final Long DECK_ID_KALAMAX = 1L;
-    private final String USER_NOT_FOUND_MSG = "The user with id: " + PHONY_USER_ID + " could not be found";
-    private final String DECK_NOT_FOUND_MSG = "The deck with id: " + DECK_ID_KALAMAX + " could not be found";
 
     @BeforeEach
     void setUp() {
@@ -104,9 +90,9 @@ class DeckControllerTest {
 
     @Test
     void shouldSuccessfullyFetchADeck() {
-        when(deckService.getDeck(DECK_ID_KALAMAX)).thenReturn(Optional.of(this.deck));
-        when(deckService.getDeck(2L)).thenReturn(Optional.of(this.deckTwo));
-        when(deckService.getDeck(3L)).thenReturn(Optional.of(this.deckThree));
+        when(deckService.getDeck(DECK_ID_KALAMAX)).thenReturn(this.deck);
+        when(deckService.getDeck(2L)).thenReturn(this.deckTwo);
+        when(deckService.getDeck(3L)).thenReturn(this.deckThree);
 
         ResponseEntity<DeckDTO> deckResponseOne = deckController.getDeck(DECK_ID_KALAMAX);
         ResponseEntity<DeckDTO> deckResponseTwo = deckController.getDeck(2L);
@@ -128,13 +114,15 @@ class DeckControllerTest {
 
     @Test
     void shouldFailFindingFetchADeck() {
-        Optional<Deck> noDeck = Optional.empty();
-        when(deckService.getDeck(4L)).thenReturn(noDeck);
+        when(deckService.getDeck(PHONY_DECK_ID)).thenThrow(new DeckNotFoundException(PHONY_DECK_ID));
 
-        ResponseEntity<DeckDTO> deckResponse = deckController.getDeck(4L);
+        Exception exception = assertThrows(DeckNotFoundException.class, () -> {
+            deckController.getDeck(PHONY_DECK_ID);
+        });
 
-        assertThat(deckResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(deckResponse.getBody()).isNull();
+        String actualMessage = exception.getMessage();
+
+        assertThat(actualMessage).isEqualTo(DECK_NOT_FOUND_MSG);
     }
 
     @Test
@@ -187,7 +175,7 @@ class DeckControllerTest {
 
     @Test
     void shouldSuccessfullyFetchUserDecks() {
-        when(deckService.getUserDecks(USER_ID)).thenReturn(decks);
+        when(deckService.getDecks(USER_ID)).thenReturn(decks);
 
         ResponseEntity<List<DeckDTO>> deckResponse = deckController.getUserDecks(USER_ID);
 
@@ -200,7 +188,7 @@ class DeckControllerTest {
 
     @Test
     void shouldFailFetchingUserDecks() {
-        when(deckService.getUserDecks(PHONY_USER_ID)).thenThrow(new UserNotFoundException(PHONY_USER_ID));
+        when(deckService.getDecks(PHONY_USER_ID)).thenThrow(new UserNotFoundException(PHONY_USER_ID));
 
         Exception exception = assertThrows(UserNotFoundException.class, () -> {
             deckController.getUserDecks(PHONY_USER_ID);
@@ -267,10 +255,10 @@ class DeckControllerTest {
 
     @Test
     void shouldFailDeletingADeckNotFound() {
-        doThrow(new DeckNotFoundException(this.deck.getDeckId())).when(deckService).deleteDeck(this.user.getUserId(), this.deck.getDeckId());
+        doThrow(new DeckNotFoundException(PHONY_DECK_ID)).when(deckService).deleteDeck(this.user.getUserId(), PHONY_DECK_ID);
 
         Exception exception = assertThrows(DeckNotFoundException.class, () -> {
-            deckController.deleteDeck(this.user.getUserId(), this.deck.getDeckId());
+            deckController.deleteDeck(this.user.getUserId(), PHONY_DECK_ID);
         });
 
         String actualMessage = exception.getMessage();

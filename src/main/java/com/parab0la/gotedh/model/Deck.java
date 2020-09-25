@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "decks")
@@ -107,5 +108,39 @@ public class Deck {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Deck deck = (Deck) o;
+        return Objects.equals(getDeckId(), deck.getDeckId()) &&
+                Objects.equals(getCommander(), deck.getCommander()) &&
+                Objects.equals(getEloRanking(), deck.getEloRanking()) &&
+                Objects.equals(getEloChangePerGame(), deck.getEloChangePerGame()) &&
+                Objects.equals(getGamesPlayed(), deck.getGamesPlayed()) &&
+                Objects.equals(getGamesWinPercent(), deck.getGamesWinPercent()) &&
+                Objects.equals(getOppsWinPercent(), deck.getOppsWinPercent()) &&
+                Objects.equals(getOwner(), deck.getOwner());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDeckId(), getCommander(), getEloRanking(), getEloChangePerGame(), getGamesPlayed(), getGamesWinPercent(), getOppsWinPercent(), getOwner());
+    }
+
+    @Override
+    public String toString() {
+        return "Deck{" +
+                "deckId=" + deckId +
+                ", commander='" + commander + '\'' +
+                ", eloRanking=" + eloRanking +
+                ", eloChangePerGame=" + eloChangePerGame +
+                ", gamesPlayed=" + gamesPlayed +
+                ", gamesWinPercent=" + gamesWinPercent +
+                ", oppsWinPercent=" + oppsWinPercent +
+                ", owner=" + owner +
+                '}';
     }
 }

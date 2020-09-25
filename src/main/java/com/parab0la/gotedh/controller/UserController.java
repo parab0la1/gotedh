@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -30,13 +29,9 @@ public class UserController {
         return new ResponseEntity<>(new UserDTO(userService.createUser(user)), HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
-        Optional<User> user = userService.getUser(id);
-
-        return user.map(userResponse ->
-                new ResponseEntity<>(new UserDTO(userResponse), HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    @GetMapping(path = "/{userId}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long userId) {
+        return new ResponseEntity<>(new UserDTO(userService.getUser(userId)), HttpStatus.OK);
     }
 
     @GetMapping

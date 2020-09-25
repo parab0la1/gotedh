@@ -1,5 +1,6 @@
 package com.parab0la.gotedh.controller;
 
+import com.parab0la.gotedh.TestRoot;
 import com.parab0la.gotedh.dto.UserDTO;
 import com.parab0la.gotedh.exception.UserNotFoundException;
 import com.parab0la.gotedh.model.User;
@@ -19,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,26 +32,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)
-class UserControllerTest {
+class UserControllerTest extends TestRoot {
 
     @InjectMocks
     UserController userController;
 
     @Mock
     private UserService userService;
-
-    private List<User> users;
-    private User user;
-    private User userTwo;
-    private User userThree;
-    private final String BRUCE_WAYNE = "Bruce Wayne";
-    private final String HARVEY_DENT = "Harvey Dent";
-    private final String ALFRED_PENNYWORTH = "Alfred Pennyworth";
-    private final Long PHONY_USER_ID = 457L;
-    private final Long USER_ID_BRUCE_WAYNE = 1L;
-    private final Long USER_ID_HARVEY_DENT = 2L;
-    private final Long USER_ID_ALFRED_PENNYWORTH = 3L;
-    private final String USER_NOT_FOUND_MSG = "The user with id: " + PHONY_USER_ID + " could not be found";
 
     @BeforeEach
     void setUp() {
@@ -82,7 +69,7 @@ class UserControllerTest {
 
     @Test
     void shouldSuccessfullyGetAUser() {
-        when(userService.getUser(user.getUserId())).thenReturn(Optional.of(user));
+        when(userService.getUser(user.getUserId())).thenReturn(user);
 
         ResponseEntity<UserDTO> userResponse = userController.getUser(user.getUserId());
 
@@ -93,12 +80,15 @@ class UserControllerTest {
 
     @Test
     void shouldFailGettingAUser() {
-        when(userService.getUser(PHONY_USER_ID)).thenReturn(Optional.empty());
+        when(userService.getUser(PHONY_USER_ID)).thenThrow(new UserNotFoundException(PHONY_USER_ID));
 
-        ResponseEntity<UserDTO> userResponse = userController.getUser(PHONY_USER_ID);
+        Exception exception = assertThrows(UserNotFoundException.class, () -> {
+            userService.getUser(PHONY_USER_ID);
+        });
 
-        assertThat(userResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(userResponse.getBody()).isNull();
+        String actualMessage = exception.getMessage();
+
+        assertThat(actualMessage).isEqualTo(USER_NOT_FOUND_MSG);
     }
 
     @Test

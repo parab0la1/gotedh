@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class DeckController {
@@ -32,10 +31,7 @@ public class DeckController {
 
     @GetMapping(path = "/decks/{id}")
     public ResponseEntity<DeckDTO> getDeck(@PathVariable Long id) {
-        Optional<Deck> optDeck = deckService.getDeck(id);
-
-        return optDeck.map(deck -> new ResponseEntity<>(new DeckDTO(deck), HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+       return new ResponseEntity<>(new DeckDTO(deckService.getDeck(id)), HttpStatus.OK);
     }
 
     @GetMapping(path = "/users/{userId}/decks/{deckId}")
@@ -50,7 +46,7 @@ public class DeckController {
 
     @GetMapping(path = "/users/{userId}/decks")
     public ResponseEntity<List<DeckDTO>> getUserDecks(@PathVariable Long userId) {
-        return new ResponseEntity<>(DeckDTO.toDeckDTOs(deckService.getUserDecks(userId)), HttpStatus.OK);
+        return new ResponseEntity<>(DeckDTO.toDeckDTOs(deckService.getDecks(userId)), HttpStatus.OK);
     }
 
     @PutMapping(path = "/users/{userId}/decks/{deckId}")
