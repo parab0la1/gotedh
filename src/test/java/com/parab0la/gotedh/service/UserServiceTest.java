@@ -90,4 +90,47 @@ class UserServiceTest extends TestRoot {
 
         assertThat(userService.getUsers()).isEqualTo(emptyUsers);
     }
+
+    @Test
+    void shouldSuccessfullyUpdateAUser() {
+        User newUser = new User(1214124L, this.user.getName(), 55,
+                55, 55, 55, new HashSet<>());
+
+        User expectedUser = new User(this.user.getUserId(), this.user.getName(), 55,
+                55, 55, 55, new HashSet<>());
+
+        when(userRepository.findById(this.user.getUserId())).thenReturn(Optional.of(this.user));
+        when(userRepository.save(expectedUser)).thenReturn(expectedUser);
+
+        User actualUser = userService.updateUser(this.user.getUserId(), newUser);
+
+        assertThat(actualUser).isEqualTo(expectedUser);
+    }
+
+    @Test
+    void shouldFailUpdatingAUser() {
+        when(userRepository.findById(PHONY_USER_ID)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(UserNotFoundException.class, () -> {
+            userService.updateUser(PHONY_USER_ID, new User());
+        });
+
+        String actualMessage = exception.getMessage();
+
+        assertThat(actualMessage).isEqualTo(USER_NOT_FOUND_MSG);
+    }
+
+    @Test
+    void shouldSuccessfullyDeleteAUser() {
+        when(userRepository.existsById(this.user.getUserId())).thenReturn(true);
+
+        userService.deleteUser(this.user.getUserId());
+    }
+
+    @Test
+    void shouldSuccessfullyDeleteANonExistingUser() {
+        when(userRepository.existsById(PHONY_USER_ID)).thenReturn(false);
+
+        userService.deleteUser(PHONY_USER_ID);
+    }
 }

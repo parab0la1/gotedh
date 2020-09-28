@@ -241,8 +241,17 @@ class DeckServiceTest extends TestRoot {
     @Test
     void shouldSuccessfullyDeleteADeck() {
         when(userService.getUser(this.user.getUserId())).thenReturn(user);
+        when(deckRepository.findByDeckIdAndOwner(this.deck.getDeckId(), this.user)).thenReturn(Optional.of(this.deck));
 
         deckService.deleteDeck(this.user.getUserId(), this.deck.getDeckId());
+    }
+
+    @Test
+    void shouldSuccessfullyDeleteANonExistingDeck() {
+        when(userService.getUser(this.user.getUserId())).thenReturn(user);
+        when(deckRepository.findByDeckIdAndOwner(PHONY_DECK_ID, this.user)).thenReturn(Optional.empty());
+
+        deckService.deleteDeck(this.user.getUserId(), PHONY_DECK_ID);
     }
 
     @Test
