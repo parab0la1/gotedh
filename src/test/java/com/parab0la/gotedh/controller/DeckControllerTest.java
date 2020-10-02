@@ -69,6 +69,12 @@ class DeckControllerTest extends TestRoot {
 
     @AfterEach
     void tearDown() {
+        this.user = null;
+        this.deck = null;
+        this.deckTwo = null;
+        this.deckThree = null;
+        this.decks = null;
+        this.deckDTO = null;
     }
 
     @Test

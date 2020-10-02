@@ -40,7 +40,7 @@ public class EloService {
 
             int currentPlace = eloDecks.get(i).getPlace();
             int currentELO = eloDecks.get(i).getEloPre();
-            Integer eloChange = 0;
+            Integer eloChange;
 
             float s;
             if (currentPlace == 1) {

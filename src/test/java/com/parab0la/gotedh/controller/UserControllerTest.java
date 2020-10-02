@@ -54,6 +54,10 @@ class UserControllerTest extends TestRoot {
 
     @AfterEach
     void tearDown() {
+        this.user = null;
+        this.userTwo = null;
+        this.userThree = null;
+        this.users = null;
     }
 
     @Test

@@ -32,9 +32,9 @@ public class GameService {
                 populatedGame.getWinner().getDeckId(),
                 populatedGame.getWinner().getCommander());
 
-        updateELORankings(populatedGame);
+        Game game = updateELORankings(populatedGame);
 
-        return gameRepository.save(populatedGame);
+        return gameRepository.save(game);
     }
 
     private Game populateGame(Game gameInput) {

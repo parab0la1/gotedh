@@ -1,6 +1,5 @@
 package com.parab0la.gotedh.controller;
 
-import com.parab0la.gotedh.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,7 @@ import javax.persistence.EntityNotFoundException;
 public class RestResponseEntityExceptionHandler
         extends ResponseEntityExceptionHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class);
 
     @ExceptionHandler(value = {EntityNotFoundException.class})
     protected ResponseEntity<String> handleEntityNotFound(RuntimeException ex) {

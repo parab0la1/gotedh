@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class UserService {
 
-    private static Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
