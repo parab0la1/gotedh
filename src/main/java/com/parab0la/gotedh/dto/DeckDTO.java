@@ -15,8 +15,11 @@ public class DeckDTO {
     private Integer eloRanking = 1000;
     private Integer eloChangePerGame = 0;
     private Integer gamesPlayed = 0;
+    private Integer gamesWon = 0;
     private Integer gamesWinPercent = 0;
     private Integer oppsWinPercent = 0;
+    private Integer podScore = 0;
+    private Integer maxPodScore = 0;
     private UserDTO owner;
 
     public DeckDTO() {
@@ -85,6 +88,14 @@ public class DeckDTO {
         this.gamesPlayed = gamesPlayed;
     }
 
+    public Integer getGamesWon() {
+        return gamesWon;
+    }
+
+    public void setGamesWon(Integer gamesWon) {
+        this.gamesWon = gamesWon;
+    }
+
     public Integer getGamesWinPercent() {
         return gamesWinPercent;
     }
@@ -101,6 +112,22 @@ public class DeckDTO {
         this.oppsWinPercent = oppsWinPercent;
     }
 
+    public Integer getPodScore() {
+        return podScore;
+    }
+
+    public void setPodScore(Integer podScore) {
+        this.podScore = podScore;
+    }
+
+    public Integer getMaxPodScore() {
+        return maxPodScore;
+    }
+
+    public void setMaxPodScore(Integer maxPodScore) {
+        this.maxPodScore = maxPodScore;
+    }
+
     public UserDTO getOwner() {
         return owner;
     }
@@ -111,7 +138,10 @@ public class DeckDTO {
 
     public Deck toDeck() {
         return new Deck(this.getCommander(), this.getEloRanking(),
-                this.getEloChangePerGame(), this.getGamesPlayed(), this.getGamesWinPercent(), this.getOppsWinPercent());
+                this.getEloChangePerGame(), this.getGamesPlayed(),
+                this.getGamesWon(), this.getGamesWinPercent(),
+                this.getOppsWinPercent(), this.getPodScore(),
+                this.getMaxPodScore());
     }
 
     public static List<Deck> toDecks(List<DeckDTO> deckDTOS) {

@@ -91,6 +91,9 @@ public class DeckService {
         deckToUpdate.setGamesPlayed(newDeck.getGamesPlayed());
         deckToUpdate.setGamesWinPercent(newDeck.getGamesWinPercent());
         deckToUpdate.setOppsWinPercent(newDeck.getOppsWinPercent());
+        deckToUpdate.setGamesWon(newDeck.getGamesWon());
+        deckToUpdate.setPodScore(newDeck.getPodScore());
+        deckToUpdate.setMaxPodScore(newDeck.getMaxPodScore());
 
         return deckToUpdate;
     }

@@ -14,6 +14,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "games")
@@ -35,6 +36,15 @@ public class Game {
             inverseJoinColumns = @JoinColumn(name = "deck_id"))
     private List<Deck> participants;
 
+    public Game() {
+    }
+
+    public Game(Long gameId, Deck winner, List<Deck> participants) {
+        this.gameId = gameId;
+        this.winner = winner;
+        this.participants = participants;
+    }
+
     public Deck getWinner() {
         return winner;
     }
@@ -49,6 +59,16 @@ public class Game {
 
     public void setParticipants(List<Deck> participants) {
         this.participants = participants;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Game game = (Game) o;
+        return Objects.equals(gameId, game.gameId) &&
+                Objects.equals(getWinner(), game.getWinner()) &&
+                Objects.equals(getParticipants(), game.getParticipants());
     }
 
     public GameDTO toGameDTO() {

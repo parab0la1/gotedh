@@ -45,13 +45,24 @@ class DeckControllerTest extends TestRoot {
     void setUp() {
         this.user = new User(USER_ID, "Joel Nilsson", 1,
                 5, 56, 46, new HashSet<>());
-
-        this.deck = new Deck(DECK_ID_KALAMAX, KALAMAX, 1,
-                2, 2, 2, 2, new User());
-        this.deckTwo = new Deck(2L, ANJE, 1,
-                2, 2, 2, 2, new User());
-        this.deckThree = new Deck(3L, KENRITH, 1,
-                2, 2, 2, 2, new User());
+        this.deck = new Deck(
+                DECK_ID_KALAMAX, KALAMAX, 1000,
+                15, 2, 50,
+                50, 1, 3,
+                7, new User()
+        );
+        this.deckTwo = new Deck(
+                2L, ANJE, 1000,
+                15, 2, 50,
+                50, 1, 3,
+                7, new User()
+        );
+        this.deckThree = new Deck(
+                3L, KENRITH, 1000,
+                15, 2, 50,
+                50, 1, 3,
+                7, new User()
+        );
 
         this.decks = new ArrayList<>();
         this.decks.add(deck);
@@ -215,14 +226,17 @@ class DeckControllerTest extends TestRoot {
 
     @Test
     void shouldSuccessfullyUpdateDeck() {
-        DeckDTO newDeckDTO = new DeckDTO(123,
-                123, 123, 13, 13);
+        DeckDTO newDeckDTO = new DeckDTO(1000,
+                15, 2, 50, 50);
 
-        Deck expectedDeck = new Deck(DECK_ID_KALAMAX, KALAMAX, 2, 3,
-                3, 3, 3, new User());
+        Deck expectedDeck = new Deck(
+                DECK_ID_KALAMAX, KALAMAX, 1000,
+                15, 2, 50,
+                50, 1, 3,
+                7, new User()
+        );
 
-        when(deckService.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, newDeckDTO.toDeck())).thenReturn(
-                expectedDeck);
+        when(deckService.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, newDeckDTO.toDeck())).thenReturn(expectedDeck);
 
         ResponseEntity<DeckDTO> deckResponse = deckController.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, newDeckDTO);
 
