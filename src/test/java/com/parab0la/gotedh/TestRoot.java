@@ -1,5 +1,6 @@
 package com.parab0la.gotedh;
 
+import com.parab0la.gotedh.dto.DeckDTO;
 import com.parab0la.gotedh.model.Deck;
 import com.parab0la.gotedh.model.User;
 
@@ -12,6 +13,7 @@ public abstract class TestRoot {
     protected Deck deck;
     protected Deck deckTwo;
     protected Deck deckThree;
+    protected DeckDTO deckDTO;
     protected User user;
     protected User userTwo;
     protected User userThree;

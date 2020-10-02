@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/v1")
 public class DeckController {
 
     private final DeckService deckService;
@@ -25,37 +27,41 @@ public class DeckController {
     }
 
     @PostMapping(path = "/users/{userId}/decks")
-    public ResponseEntity<DeckDTO> createDeck(@PathVariable Long userId, @RequestBody Deck deck) {
-        return new ResponseEntity<>(new DeckDTO(deckService.createDeck(userId, deck)), HttpStatus.CREATED);
+    public ResponseEntity<DeckDTO> createDeck(@PathVariable Long userId, @RequestBody DeckDTO deckInput) {
+        Deck deck = deckInput.toDeck();
+
+        Deck deckDTO = deckService.createDeck(userId, deck);
+
+        return new ResponseEntity<>(deckDTO.toDeckDTO(), HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/decks/{id}")
     public ResponseEntity<DeckDTO> getDeck(@PathVariable Long id) {
-       return new ResponseEntity<>(new DeckDTO(deckService.getDeck(id)), HttpStatus.OK);
+        return new ResponseEntity<>(deckService.getDeck(id).toDeckDTO(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/users/{userId}/decks/{deckId}")
     public ResponseEntity<DeckDTO> getUserDeck(@PathVariable Long userId, @PathVariable Long deckId) {
-        return new ResponseEntity<>(new DeckDTO(deckService.getUserDeck(userId, deckId)), HttpStatus.OK);
+        return new ResponseEntity<>(deckService.getUserDeck(userId, deckId).toDeckDTO(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/decks")
     public ResponseEntity<List<DeckDTO>> getDecks() {
-        return new ResponseEntity<>(DeckDTO.toDeckDTOs(deckService.getDecks()), HttpStatus.OK);
+        return new ResponseEntity<>(Deck.toDeckDTOs(deckService.getDecks()), HttpStatus.OK);
     }
 
     @GetMapping(path = "/users/{userId}/decks")
     public ResponseEntity<List<DeckDTO>> getUserDecks(@PathVariable Long userId) {
-        return new ResponseEntity<>(DeckDTO.toDeckDTOs(deckService.getDecks(userId)), HttpStatus.OK);
+        return new ResponseEntity<>(Deck.toDeckDTOs(deckService.getDecks(userId)), HttpStatus.OK);
     }
 
     @PutMapping(path = "/users/{userId}/decks/{deckId}")
-    public ResponseEntity<DeckDTO> updateDeck(@PathVariable Long userId, @PathVariable Long deckId, @RequestBody Deck deck) {
+    public ResponseEntity<DeckDTO> updateDeck(@PathVariable Long userId, @PathVariable Long deckId, @RequestBody DeckDTO deckInput) {
+        Deck deck = deckInput.toDeck();
+
         Deck updatedDeck = deckService.updateDeck(userId, deckId, deck);
 
-        return deckService.updateDeck(userId, deckId, deck) != null ?
-                new ResponseEntity<>(new DeckDTO(updatedDeck), HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(updatedDeck.toDeckDTO(), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/users/{userId}/decks/{deckId}")

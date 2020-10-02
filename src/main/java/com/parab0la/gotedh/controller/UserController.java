@@ -18,20 +18,24 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/v1/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
-        return new ResponseEntity<>(new UserDTO(userService.createUser(user)), HttpStatus.CREATED);
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userInput) {
+        User user = userInput.toUser();
+
+        User userResponse = userService.createUser(user);
+
+        return new ResponseEntity<>(userResponse.toUserDTO(), HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/{userId}")
     public ResponseEntity<UserDTO> getUser(@PathVariable Long userId) {
-        return new ResponseEntity<>(new UserDTO(userService.getUser(userId)), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUser(userId).toUserDTO(), HttpStatus.OK);
     }
 
     @GetMapping
@@ -40,12 +44,12 @@ public class UserController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userInput) {
+        User user = userInput.toUser();
+
         User updatedUser = userService.updateUser(id, user);
 
-        return updatedUser != null ?
-                new ResponseEntity<>(new UserDTO(updatedUser), HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(updatedUser.toUserDTO(), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")

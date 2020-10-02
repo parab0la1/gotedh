@@ -58,13 +58,15 @@ class UserControllerTest extends TestRoot {
 
     @Test
     void shouldSuccessfullyCreateAUser() {
-        when(userService.createUser(user)).thenReturn(user);
+        UserDTO userInput = this.user.toUserDTO();
 
-        ResponseEntity<UserDTO> userResponse = userController.createUser(user);
+        when(userService.createUser(userInput.toUser())).thenReturn(this.user);
+
+        ResponseEntity<UserDTO> userResponse = userController.createUser(userInput);
 
         assertThat(userResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(userResponse.getBody()).isNotNull();
-        assertThat(userResponse.getBody()).isEqualTo(new UserDTO(user));
+        assertThat(userResponse.getBody()).isEqualTo(this.user.toUserDTO());
     }
 
     @Test
@@ -116,19 +118,19 @@ class UserControllerTest extends TestRoot {
 
     @Test
     void shouldSuccessfullyUpdateAUser() {
-        User newUser = new User(1231231L, "Harald Treutiger", 5,
-                5, 5, 5, new HashSet<>());
+        UserDTO userInput = new UserDTO("Harald Treutiger", 5,
+                5, 5, 5);
 
-        when(userService.updateUser(user.getUserId(), newUser))
-                .thenReturn(new User(user.getUserId(), "Harald Treutiger", 5,
-                        5, 5, 5, new HashSet<>()));
+        User expectedUser = new User(this.user.getUserId(), userInput.getName(), userInput.getEloRanking(),
+                userInput.getGamesPlayed(), userInput.getGamesWinPercent(), userInput.getOppsWinPercent(), new HashSet<>());
 
-        ResponseEntity<UserDTO> userResponse = userController.updateUser(user.getUserId(), newUser);
+        when(userService.updateUser(this.user.getUserId(), userInput.toUser())).thenReturn(expectedUser);
+
+        ResponseEntity<UserDTO> userResponse = userController.updateUser(user.getUserId(), userInput);
 
         assertThat(userResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(userResponse.getBody()).isNotNull();
-        assertThat((userResponse.getBody())).isEqualTo(new UserDTO(new User(user.getUserId(), "Harald Treutiger", 5,
-                5, 5, 5, new HashSet<>())));
+        assertThat((userResponse.getBody())).isEqualTo(expectedUser.toUserDTO());
     }
 
     @Test

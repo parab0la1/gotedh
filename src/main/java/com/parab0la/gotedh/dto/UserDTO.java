@@ -1,6 +1,7 @@
 package com.parab0la.gotedh.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.parab0la.gotedh.model.Deck;
 import com.parab0la.gotedh.model.User;
 
 import java.util.ArrayList;
@@ -31,8 +32,16 @@ public class UserDTO {
         this.oppsWinPercent = user.getOppsWinPercent();
 
         if (user.getDecks() != null) {
-            this.decks = DeckDTO.toDeckDTOs(new ArrayList<>(user.getDecks()));
+            this.decks = Deck.toDeckDTOs(new ArrayList<>(user.getDecks()));
         }
+    }
+
+    public UserDTO(String name, Integer eloRanking, Integer gamesPlayed, Integer gamesWinPercent, Integer oppsWinPercent) {
+        this.name = name;
+        this.eloRanking = eloRanking;
+        this.gamesPlayed = gamesPlayed;
+        this.gamesWinPercent = gamesWinPercent;
+        this.oppsWinPercent = oppsWinPercent;
     }
 
     public Long getUserId() {
@@ -93,6 +102,11 @@ public class UserDTO {
 
     public static List<UserDTO> toUserDTOs(List<User> users) {
         return users.stream().map(user -> new UserDTO(user)).collect(Collectors.toList());
+    }
+
+    public User toUser() {
+        return new User(this.getName(), this.getEloRanking(),
+                this.getGamesPlayed(), this.getGamesWinPercent(), this.getOppsWinPercent());
     }
 
     @Override

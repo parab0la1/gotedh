@@ -12,16 +12,15 @@ public class DeckDTO {
 
     private Long deckId;
     private String commander;
-    private Integer eloRanking;
-    private Integer eloChangePerGame;
-    private Integer gamesPlayed;
-    private Integer gamesWinPercent;
-    private Integer oppsWinPercent;
+    private Integer eloRanking = 1000;
+    private Integer eloChangePerGame = 0;
+    private Integer gamesPlayed = 0;
+    private Integer gamesWinPercent = 0;
+    private Integer oppsWinPercent = 0;
     private UserDTO owner;
 
     public DeckDTO() {
     }
-
 
     public DeckDTO(Deck deck) {
         this.deckId = deck.getDeckId();
@@ -32,11 +31,18 @@ public class DeckDTO {
         this.gamesWinPercent = deck.getGamesWinPercent();
         this.oppsWinPercent = deck.getOppsWinPercent();
 
-        deck.getOwner().setDecks(null);
         if (deck.getOwner() != null) {
+            deck.getOwner().setDecks(null);
             this.owner = new UserDTO(deck.getOwner());
         }
+    }
 
+    public DeckDTO(Integer eloRanking, Integer eloChangePerGame, Integer gamesPlayed, Integer gamesWinPercent, Integer oppsWinPercent) {
+        this.eloRanking = eloRanking;
+        this.eloChangePerGame = eloChangePerGame;
+        this.gamesPlayed = gamesPlayed;
+        this.gamesWinPercent = gamesWinPercent;
+        this.oppsWinPercent = oppsWinPercent;
     }
 
     public Long getDeckId() {
@@ -103,8 +109,13 @@ public class DeckDTO {
         this.owner = owner;
     }
 
-    public static List<DeckDTO> toDeckDTOs(List<Deck> decks) {
-        return decks.stream().map(deck -> new DeckDTO(deck)).collect(Collectors.toList());
+    public Deck toDeck() {
+        return new Deck(this.getCommander(), this.getEloRanking(),
+                this.getEloChangePerGame(), this.getGamesPlayed(), this.getGamesWinPercent(), this.getOppsWinPercent());
+    }
+
+    public static List<Deck> toDecks(List<DeckDTO> deckDTOS) {
+        return deckDTOS.stream().map(deckDTO -> new Deck(deckDTO)).collect(Collectors.toList());
     }
 
     @Override

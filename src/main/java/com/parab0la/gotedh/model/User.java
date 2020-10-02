@@ -1,6 +1,7 @@
 package com.parab0la.gotedh.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.parab0la.gotedh.dto.UserDTO;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -26,7 +27,8 @@ public class User {
     private Integer gamesPlayed;
     private Integer gamesWinPercent;
     private Integer oppsWinPercent;
-    @JsonManagedReference
+
+    @JsonBackReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<Deck> decks = new HashSet<>();
 
@@ -43,6 +45,14 @@ public class User {
         this.gamesWinPercent = gamesWinPercent;
         this.oppsWinPercent = oppsWinPercent;
         this.decks = decks;
+    }
+
+    public User(String name, Integer eloRanking, Integer gamesPlayed, Integer gamesWinPercent, Integer oppsWinPercent) {
+        this.name = name;
+        this.eloRanking = eloRanking;
+        this.gamesPlayed = gamesPlayed;
+        this.gamesWinPercent = gamesWinPercent;
+        this.oppsWinPercent = oppsWinPercent;
     }
 
     public Long getUserId() {
@@ -101,6 +111,10 @@ public class User {
         this.decks = decks;
     }
 
+    public UserDTO toUserDTO() {
+        return new UserDTO(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -116,11 +130,6 @@ public class User {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getUserId(), getName(), getEloRanking(), getGamesPlayed(), getGamesWinPercent(), getOppsWinPercent(), getDecks());
-    }
-
-    @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +
@@ -129,7 +138,6 @@ public class User {
                 ", gamesPlayed=" + gamesPlayed +
                 ", gamesWinPercent=" + gamesWinPercent +
                 ", oppsWinPercent=" + oppsWinPercent +
-                ", decks=" + decks +
                 '}';
     }
 }

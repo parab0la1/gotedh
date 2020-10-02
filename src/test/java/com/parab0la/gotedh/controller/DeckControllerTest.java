@@ -27,7 +27,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -58,6 +57,14 @@ class DeckControllerTest extends TestRoot {
         this.decks.add(deck);
         this.decks.add(deckTwo);
         this.decks.add(deckThree);
+
+        this.deckDTO = new DeckDTO();
+        this.deckDTO.setCommander(this.deck.getCommander());
+        this.deckDTO.setEloRanking(this.deck.getEloRanking());
+        this.deckDTO.setEloChangePerGame(this.deck.getEloChangePerGame());
+        this.deckDTO.setGamesPlayed(this.deck.getGamesPlayed());
+        this.deckDTO.setGamesWinPercent(this.deck.getGamesWinPercent());
+        this.deckDTO.setOppsWinPercent(this.deck.getOppsWinPercent());
     }
 
     @AfterEach
@@ -66,21 +73,21 @@ class DeckControllerTest extends TestRoot {
 
     @Test
     void shouldSuccessfullyCreateADeck() {
-        when(deckService.createDeck(this.user.getUserId(), this.deck)).thenReturn(this.deck);
+        when(deckService.createDeck(this.user.getUserId(), this.deckDTO.toDeck())).thenReturn(this.deck);
 
-        ResponseEntity<DeckDTO> deckResponseOne = deckController.createDeck(this.user.getUserId(), this.deck);
+        ResponseEntity<DeckDTO> deckResponseOne = deckController.createDeck(this.user.getUserId(), this.deckDTO);
 
         assertThat(deckResponseOne.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(deckResponseOne.getBody()).isNotNull();
-        assertThat(deckResponseOne.getBody().getCommander()).isEqualTo(KALAMAX);
+        assertThat(deckResponseOne.getBody()).isEqualTo(new DeckDTO(this.deck));
     }
 
     @Test
     void shouldFailCreatingADeck() {
-        when(deckService.createDeck(PHONY_USER_ID, this.deck)).thenThrow(new UserNotFoundException(PHONY_USER_ID));
+        when(deckService.createDeck(PHONY_USER_ID, this.deckDTO.toDeck())).thenThrow(new UserNotFoundException(PHONY_USER_ID));
 
         Exception exception = assertThrows(UserNotFoundException.class, () -> {
-            deckController.createDeck(PHONY_USER_ID, this.deck);
+            deckController.createDeck(PHONY_USER_ID, this.deckDTO);
         });
 
         String actualMessage = exception.getMessage();
@@ -158,7 +165,7 @@ class DeckControllerTest extends TestRoot {
         assertThat(deckResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(deckResponse.getBody()).isNotNull();
         assertThat((deckResponse.getBody()).size()).isEqualTo(decks.size());
-        assertEquals(DeckDTO.toDeckDTOs(this.decks), deckResponse.getBody());
+        assertEquals(Deck.toDeckDTOs(this.decks), deckResponse.getBody());
     }
 
     @Test
@@ -183,7 +190,7 @@ class DeckControllerTest extends TestRoot {
         assertThat(deckResponse.getBody()).isNotNull();
         assertThat((deckResponse.getBody()).size()).isEqualTo(decks.size());
 
-        assertEquals(DeckDTO.toDeckDTOs(this.decks), deckResponse.getBody());
+        assertEquals(Deck.toDeckDTOs(this.decks), deckResponse.getBody());
     }
 
     @Test
@@ -202,33 +209,34 @@ class DeckControllerTest extends TestRoot {
 
     @Test
     void shouldSuccessfullyUpdateDeck() {
-        Deck updatedDeck = new Deck(DECK_ID_KALAMAX, "Not-change Changesson", 2,
-                3, 3, 3, 3, new User());
+        DeckDTO newDeckDTO = new DeckDTO(123,
+                123, 123, 13, 13);
 
-        when(deckService.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, updatedDeck)).thenReturn(
-                new Deck(DECK_ID_KALAMAX, KALAMAX, 2, 3,
-                        3, 3, 3, new User()
-                ));
+        Deck expectedDeck = new Deck(DECK_ID_KALAMAX, KALAMAX, 2, 3,
+                3, 3, 3, new User());
 
-        ResponseEntity<DeckDTO> deckResponse = deckController.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, updatedDeck);
+        when(deckService.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, newDeckDTO.toDeck())).thenReturn(
+                expectedDeck);
+
+        ResponseEntity<DeckDTO> deckResponse = deckController.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, newDeckDTO);
 
         assertThat(deckResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(deckResponse.getBody()).isNotNull();
-        assertEquals(new DeckDTO(
-                new Deck(DECK_ID_KALAMAX, KALAMAX,
-                        2, 3, 3,
-                        3, 3, new User()
-                )), deckResponse.getBody());
+        assertEquals(new DeckDTO(expectedDeck), deckResponse.getBody());
     }
 
     @Test
     void shouldFailUpdatingDeck() {
-        when(deckService.updateDeck(any(), any(), any())).thenReturn(null);
+        DeckDTO phonyDeckDTO = new DeckDTO();
+        when(deckService.updateDeck(this.user.getUserId(), PHONY_DECK_ID, phonyDeckDTO.toDeck())).thenThrow(new DeckNotFoundException(PHONY_DECK_ID));
 
-        ResponseEntity<DeckDTO> deckResponse = deckController.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, new Deck());
+        Exception exception = assertThrows(DeckNotFoundException.class, () -> {
+            deckController.updateDeck(this.user.getUserId(), PHONY_DECK_ID, phonyDeckDTO);
+        });
 
-        assertThat(deckResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(deckResponse.getBody()).isNull();
+        String actualMessage = exception.getMessage();
+
+        assertThat(actualMessage).isEqualTo(DECK_NOT_FOUND_MSG);
     }
 
     @Test
