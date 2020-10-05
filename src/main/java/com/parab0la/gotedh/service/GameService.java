@@ -17,12 +17,15 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final DeckService deckService;
-    private final EloService eloService;
+    private final EloRatingService eloRatingService;
+    private final RatingService ratingService;
 
-    public GameService(EloService eloService, GameRepository gameRepository, DeckService deckService) {
-        this.eloService = eloService;
+    public GameService(EloRatingService eloRatingService, GameRepository gameRepository,
+                       DeckService deckService, RatingService ratingService) {
+        this.eloRatingService = eloRatingService;
         this.gameRepository = gameRepository;
         this.deckService = deckService;
+        this.ratingService = ratingService;
     }
 
     public Game createGame(Game gameInput) {
@@ -32,78 +35,28 @@ public class GameService {
                 populatedGame.getWinner().getDeckId(),
                 populatedGame.getWinner().getCommander());
 
-        Game game = updateRankings(populatedGame);
+        Game updatedEloGame = updateGameELORankings(populatedGame);
+        Game updatedRatingGame = updateGameRankings(updatedEloGame);
 
-        return gameRepository.save(game);
+        return gameRepository.save(updatedRatingGame);
     }
 
     private Game populateGame(Game gameInput) {
-        Game game = new Game();
+        gameInput.setParticipants(populateParticipants(gameInput));
+        gameInput.setWinner(deckService.getDeck(gameInput.getWinner().getDeckId()));
 
-        game.setParticipants(populateParticipants(gameInput));
-        game.setWinner(deckService.getDeck(gameInput.getWinner().getDeckId()));
-
-        return game;
+        return gameInput;
     }
 
     private List<Deck> populateParticipants(Game gameInput) {
         return gameInput.getParticipants().stream().map(deckParticipant -> deckService.getDeck(deckParticipant.getDeckId())).collect(Collectors.toList());
     }
 
-    private Game updateRankings(Game game) {
-        Game updatedGame = updateGameValues(game);
-
-        return updateELORankings(updatedGame);
+    private Game updateGameRankings(Game game) {
+        return ratingService.updateRankings(game);
     }
 
-    private Game updateGameValues(Game game) {
-        game.getParticipants().forEach(deck -> {
-            deck.setGamesPlayed(deck.getGamesPlayed() + 1);
-            updateOppsWinPercent(game, deck);
-            updateGamesWinPercent(deck);
-        });
-
-        return game;
-    }
-
-    private void updateOppsWinPercent(Game game, Deck deck) {
-        Integer podScore = game.getParticipants().size() - 1;
-
-        if (deck.getDeckId().equals(game.getWinner().getDeckId())) {
-            deck.setGamesWon(deck.getGamesWon() + 1);
-
-//            If the deck is the winner, it receives the podscore for the game
-            Integer deckPodScore = deck.getPodScore() + (podScore);
-            deck.setPodScore(deckPodScore);
-        }
-
-        deck.setMaxPodScore(deck.getMaxPodScore() + podScore);
-
-        float winPercent = deck.getPodScore().floatValue() / deck.getMaxPodScore().floatValue();
-
-        deck.setOppsWinPercent(Math.round(winPercent * 100));
-
-        logger.debug("Updating opponent win % for deck: {}, {}, new opps win %: {}",
-                deck.getDeckId(), deck.getCommander(), deck.getOppsWinPercent());
-    }
-
-    private void updateGamesWinPercent(Deck deck) {
-        float winPercent = deck.getWonGamesList().size() / deck.getGamesPlayed().floatValue();
-
-        deck.setGamesWinPercent(Math.round(winPercent * 100));
-
-        logger.debug("Updating win % for deck: {}, {}, new win %: {}",
-                deck.getDeckId(), deck.getCommander(), Math.round(winPercent * 100));
-
-        deck.setGamesWinPercent(Math.round(winPercent * 100));
-    }
-
-    private Game updateELORankings(Game game) {
-        eloService.calculateELOs(game.getParticipants(), game.getWinner().getDeckId());
-
-        eloService.updateELORankings(game.getParticipants());
-        eloService.resetPlayers();
-
-        return game;
+    private Game updateGameELORankings(Game game) {
+        return eloRatingService.updateGameELORankings(game);
     }
 }

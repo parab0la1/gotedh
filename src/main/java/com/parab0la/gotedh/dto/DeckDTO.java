@@ -33,6 +33,8 @@ public class DeckDTO {
         this.gamesPlayed = deck.getGamesPlayed();
         this.gamesWinPercent = deck.getGamesWinPercent();
         this.oppsWinPercent = deck.getOppsWinPercent();
+        this.podScore = deck.getPodScore();
+        this.maxPodScore = deck.getMaxPodScore();
 
         if (deck.getOwner() != null) {
             deck.getOwner().setDecks(null);
@@ -40,12 +42,17 @@ public class DeckDTO {
         }
     }
 
-    public DeckDTO(Integer eloRanking, Integer eloChangePerGame, Integer gamesPlayed, Integer gamesWinPercent, Integer oppsWinPercent) {
+    public DeckDTO(Integer eloRanking, Integer eloChangePerGame,
+                   Integer gamesPlayed, Integer gamesWinPercent,
+                   Integer oppsWinPercent, Integer podScore,
+                   Integer maxPodScore) {
         this.eloRanking = eloRanking;
         this.eloChangePerGame = eloChangePerGame;
         this.gamesPlayed = gamesPlayed;
         this.gamesWinPercent = gamesWinPercent;
         this.oppsWinPercent = oppsWinPercent;
+        this.podScore = podScore;
+        this.maxPodScore = maxPodScore;
     }
 
     public Long getDeckId() {
@@ -158,13 +165,11 @@ public class DeckDTO {
                 Objects.equals(getEloRanking(), deckDTO.getEloRanking()) &&
                 Objects.equals(getEloChangePerGame(), deckDTO.getEloChangePerGame()) &&
                 Objects.equals(getGamesPlayed(), deckDTO.getGamesPlayed()) &&
+                Objects.equals(getGamesWon(), deckDTO.getGamesWon()) &&
                 Objects.equals(getGamesWinPercent(), deckDTO.getGamesWinPercent()) &&
                 Objects.equals(getOppsWinPercent(), deckDTO.getOppsWinPercent()) &&
+                Objects.equals(getPodScore(), deckDTO.getPodScore()) &&
+                Objects.equals(getMaxPodScore(), deckDTO.getMaxPodScore()) &&
                 Objects.equals(getOwner(), deckDTO.getOwner());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getDeckId(), getCommander(), getEloRanking(), getEloChangePerGame(), getGamesPlayed(), getGamesWinPercent(), getOppsWinPercent(), getOwner());
     }
 }

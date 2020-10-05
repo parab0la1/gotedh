@@ -1,6 +1,7 @@
 package com.parab0la.gotedh.service;
 
 import com.parab0la.gotedh.model.Deck;
+import com.parab0la.gotedh.model.Game;
 import com.parab0la.gotedh.model.elo.ELODeck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +11,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class EloService {
+public class EloRatingService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EloService.class);
+    private static final Logger logger = LoggerFactory.getLogger(EloRatingService.class);
 
     private List<ELODeck> eloDecks = new ArrayList<>();
+
+    public Game updateGameELORankings(Game game) {
+        logger.debug("Calculating ELO ratings for game with winner: {}", game.getWinner().getCommander());
+
+        calculateELOs(game.getParticipants(), game.getWinner().getDeckId());
+
+        updateELORankings(game.getParticipants());
+        resetPlayers();
+
+        return game;
+    }
+
+    private void calculateELOs(List<Deck> decks, Long winnerId) {
+        addPlayers(decks, winnerId);
+
+        for (ELODeck eloDeck : eloDecks) {
+            float K = getKValueForDeck(eloDeck);
+            logger.debug("K value for deck: {} is: {}", eloDeck.getName(), K);
+
+            int currentPlace = eloDeck.getPlace();
+            int currentELO = eloDeck.getEloPre();
+            Integer eloChange;
+
+            float s;
+            if (currentPlace == 1) {
+                s = 1.0F;
+            } else {
+                s = 0F;
+            }
+
+//            Work out EA
+            float EA = getCurrentPlayerEA(currentELO) / getOtherPlayersEA();
+
+//            calculate ELO change vs all opponents
+            eloChange = Math.round(K * (s - EA));
+            eloDeck.setEloPost(eloDeck.getEloPre() + eloChange);
+
+            logger.debug("Final ELO calculated for deck: {} new ELO rating: {}", eloDeck.getName(), eloDeck.getEloPost());
+        }
+
+    }
 
     private void addPlayers(List<Deck> decks, Long winnerId) {
         for (Deck deck : decks) {
@@ -31,35 +73,6 @@ public class EloService {
         }
     }
 
-    public void calculateELOs(List<Deck> decks, Long winnerId) {
-        addPlayers(decks, winnerId);
-
-        for (int i = 0; i < eloDecks.size(); i++) {
-            float K = getKValueForDeck(eloDecks.get(i), eloDecks.size());
-            logger.debug("K value for deck: {} is: {}", eloDecks.get(i).getName(), K);
-
-            int currentPlace = eloDecks.get(i).getPlace();
-            int currentELO = eloDecks.get(i).getEloPre();
-            Integer eloChange;
-
-            float s;
-            if (currentPlace == 1) {
-                s = 1.0F;
-            } else {
-                s = 0F;
-            }
-
-//            Work out EA
-            float EA = getCurrentPlayerEA(currentELO) / getOtherPlayersEA();
-
-//            calculate ELO change vs all opponents
-            eloChange = Math.round(K * (s - EA));
-            eloDecks.get(i).setEloPost(eloDecks.get(i).getEloPre() + eloChange);
-
-            logger.debug("Final ELO calculated for deck: {} new ELO rating: {}", eloDecks.get(i).getName(), eloDecks.get(i).getEloPost());
-        }
-
-    }
 
     private float getCurrentPlayerEA(int currentPlayerELO) {
         double currentPlayerEA = Math.pow(10.0f, currentPlayerELO / 400.0f);
@@ -70,18 +83,18 @@ public class EloService {
     private float getOtherPlayersEA() {
         float totalEA = 0.0f;
 
-        for (int i = 0; i < eloDecks.size(); i++) {
-            totalEA = totalEA + (float) Math.pow(10.0f, eloDecks.get(i).getEloPre() / 400.0f);
+        for (ELODeck eloDeck : eloDecks) {
+            totalEA = totalEA + (float) Math.pow(10.0f, eloDeck.getEloPre() / 400.0f);
         }
 
         return totalEA;
     }
 
-    public void resetPlayers() {
+    private void resetPlayers() {
         this.eloDecks = new ArrayList<>();
     }
 
-    public void updateELORankings(List<Deck> decks) {
+    private void updateELORankings(List<Deck> decks) {
         for (Deck deck : decks) {
             setELOValues(deck);
         }
@@ -105,7 +118,7 @@ public class EloService {
         return (elo - 1000) / gamesPlayed;
     }
 
-    private float getKValueForDeck(ELODeck deck, Integer playerCount) {
+    private float getKValueForDeck(ELODeck deck) {
         float k;
 
         if (deck.getEloPre() > 2400) {

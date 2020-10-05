@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-
 @RunWith(MockitoJUnitRunner.class)
 @ExtendWith(MockitoExtension.class)
 class GameServiceTest extends TestRoot {
@@ -39,34 +38,44 @@ class GameServiceTest extends TestRoot {
     private DeckService deckService;
 
     @Mock
-    private EloService eloService;
+    private EloRatingService eloRatingService;
+
+    @Mock
+    private RatingService ratingService;
+
+    Game populatedGame;
 
     @BeforeEach
     void setUp() {
-
         this.user = new User(USER_ID, "Joel Nilsson", 1,
                 5, 56, 46, new HashSet<>());
 
+        populatedGame = new Game();
+        populatedGame.setParticipants(new ArrayList<>());
+
         this.deck = new Deck(
-                DECK_ID_KALAMAX, KALAMAX, 1000,
+                DECK_ID_KALAMAX, KALAMAX, 1126,
                 15, 2, 50,
                 50, 1, 3,
                 7, new User()
         );
+
         this.deckTwo = new Deck(
-                DECK_ID_ANJE, ANJE, 1000,
+                DECK_ID_ANJE, ANJE, 1084,
                 15, 2, 50,
                 50, 1, 3,
                 7, new User()
         );
+
         this.deckThree = new Deck(
-                DECK_ID_KENRITH, KENRITH, 1000,
+                DECK_ID_KENRITH, KENRITH, 1072,
                 15, 2, 50,
                 50, 1, 3,
                 7, new User()
         );
+
         this.deckFour = new Deck(
-                DECK_ID_OMNATH, OMNATH, 1000,
+                DECK_ID_OMNATH, OMNATH, 1067,
                 15, 2, 50,
                 50, 1, 3,
                 7, new User()
@@ -76,6 +85,10 @@ class GameServiceTest extends TestRoot {
         this.decks.add(deck);
         this.decks.add(deckTwo);
         this.decks.add(deckThree);
+        this.decks.add(deckFour);
+
+        populatedGame.setParticipants(this.decks);
+        populatedGame.setWinner(this.deck);
 
         Deck deckInputOne = new Deck();
         deckInputOne.setDeckId(DECK_ID_KALAMAX);
@@ -116,5 +129,54 @@ class GameServiceTest extends TestRoot {
 
     @Test
     void shouldSuccessfullyCreateAGame() {
+        Game expectedGame = new Game();
+        expectedGame.setParticipants(new ArrayList<>());
+//        Expected decks with new stats (Games played, game winner, win %)
+        Deck expectedDeckOne = new Deck(
+                DECK_ID_KALAMAX, KALAMAX, 1126,
+                15, 3, 67,
+                60, 2, 6,
+                10, new User()
+        );
+
+        Deck expectedDeckTwo = new Deck(
+                DECK_ID_ANJE, ANJE, 1084,
+                15, 3, 33,
+                30, 1, 3,
+                10, new User()
+        );
+
+        Deck expectedDeckThree = new Deck(
+                DECK_ID_KENRITH, KENRITH, 1072,
+                15, 3, 33,
+                30, 1, 3,
+                10, new User()
+        );
+
+        Deck expectedDeckFour = new Deck(
+                DECK_ID_OMNATH, OMNATH, 1067,
+                15, 3, 33,
+                30, 1, 3,
+                10, new User()
+        );
+
+        expectedGame.getParticipants().add(expectedDeckOne);
+        expectedGame.getParticipants().add(expectedDeckTwo);
+        expectedGame.getParticipants().add(expectedDeckThree);
+        expectedGame.getParticipants().add(expectedDeckFour);
+
+        when(deckService.getDeck(DECK_ID_KALAMAX)).thenReturn(this.deck);
+        when(deckService.getDeck(DECK_ID_ANJE)).thenReturn(this.deckTwo);
+        when(deckService.getDeck(DECK_ID_KENRITH)).thenReturn(this.deckThree);
+        when(deckService.getDeck(DECK_ID_OMNATH)).thenReturn(this.deckFour);
+
+        when(eloRatingService.updateGameELORankings(populatedGame)).thenReturn(populatedGame);
+        when(ratingService.updateRankings(populatedGame)).thenReturn(expectedGame);
+
+        when(gameRepository.save(expectedGame)).thenReturn(expectedGame);
+
+        Game actualGame = gameService.createGame(this.game);
+
+        assertThat(actualGame).isEqualTo(expectedGame);
     }
 }

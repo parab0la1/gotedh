@@ -100,6 +100,27 @@ class DeckControllerTest extends TestRoot {
     }
 
     @Test
+    void shouldSuccessfullyCreateADeckFromEmptyInput() {
+        DeckDTO emptyDeckInput = new DeckDTO();
+        emptyDeckInput.setCommander(KALAMAX);
+
+        DeckDTO expectedDeckDTO = new DeckDTO(
+                1000, 0, 0,
+                0, 0, 0, 0
+        );
+
+        expectedDeckDTO.setCommander(KALAMAX);
+
+        when(deckService.createDeck(this.user.getUserId(), emptyDeckInput.toDeck())).thenReturn(emptyDeckInput.toDeck());
+
+        ResponseEntity<DeckDTO> deckResponseOne = deckController.createDeck(this.user.getUserId(), emptyDeckInput);
+
+        assertThat(deckResponseOne.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(deckResponseOne.getBody()).isNotNull();
+        assertThat(deckResponseOne.getBody()).isEqualTo(expectedDeckDTO);
+    }
+
+    @Test
     void shouldFailCreatingADeck() {
         when(deckService.createDeck(PHONY_USER_ID, this.deckDTO.toDeck())).thenThrow(new UserNotFoundException(PHONY_USER_ID));
 
@@ -227,13 +248,13 @@ class DeckControllerTest extends TestRoot {
     @Test
     void shouldSuccessfullyUpdateDeck() {
         DeckDTO newDeckDTO = new DeckDTO(1000,
-                15, 2, 50, 50);
+                15, 2, 50, 50, 3, 10);
 
         Deck expectedDeck = new Deck(
                 DECK_ID_KALAMAX, KALAMAX, 1000,
                 15, 2, 50,
                 50, 1, 3,
-                7, new User()
+                10, new User()
         );
 
         when(deckService.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, newDeckDTO.toDeck())).thenReturn(expectedDeck);
