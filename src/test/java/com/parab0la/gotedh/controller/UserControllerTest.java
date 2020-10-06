@@ -42,9 +42,14 @@ class UserControllerTest extends TestRoot {
 
     @BeforeEach
     void setUp() {
-        user = new User(USER_ID_BRUCE_WAYNE, BRUCE_WAYNE, 1, 1, 1, 1, new HashSet<>());
-        userTwo = new User(USER_ID_HARVEY_DENT, HARVEY_DENT, 2, 2, 2, 2, new HashSet<>());
-        userThree = new User(USER_ID_ALFRED_PENNYWORTH, ALFRED_PENNYWORTH, 3, 3, 3, 3, new HashSet<>());
+        user = new User(USER_ID_BRUCE_WAYNE, BRUCE_WAYNE, 1, 1,
+                1, 1, new HashSet<>());
+
+        userTwo = new User(USER_ID_HARVEY_DENT, HARVEY_DENT, 2, 2,
+                2, 2, new HashSet<>());
+
+        userThree = new User(USER_ID_ALFRED_PENNYWORTH, ALFRED_PENNYWORTH, 3,
+                3, 3, 3, new HashSet<>());
 
         users = new ArrayList<>();
         users.add(user);

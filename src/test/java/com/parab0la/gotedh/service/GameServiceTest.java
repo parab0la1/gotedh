@@ -53,33 +53,17 @@ class GameServiceTest extends TestRoot {
         populatedGame = new Game();
         populatedGame.setParticipants(new ArrayList<>());
 
-        this.deck = new Deck(
-                DECK_ID_KALAMAX, KALAMAX, 1126,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
+        this.deck = new Deck(DECK_ID_KALAMAX, KALAMAX, 1126, 15, 2,
+                50, 50, 1, 3, 7, new User());
 
-        this.deckTwo = new Deck(
-                DECK_ID_ANJE, ANJE, 1084,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
+        this.deckTwo = new Deck(DECK_ID_ANJE, ANJE, 1084, 15, 2,
+                50, 50, 1, 3, 7, new User());
 
-        this.deckThree = new Deck(
-                DECK_ID_KENRITH, KENRITH, 1072,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
+        this.deckThree = new Deck(DECK_ID_KENRITH, KENRITH, 1072, 15, 2,
+                50, 50, 1, 3, 7, new User());
 
-        this.deckFour = new Deck(
-                DECK_ID_OMNATH, OMNATH, 1067,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
+        this.deckFour = new Deck(DECK_ID_OMNATH, OMNATH, 1067, 15, 2,
+                50, 50, 1, 3, 7, new User());
 
         this.decks = new ArrayList<>();
         this.decks.add(deck);
@@ -112,6 +96,12 @@ class GameServiceTest extends TestRoot {
 
     @AfterEach
     void tearDown() {
+        this.user = null;
+        this.populatedGame = null;
+        this.deck = null;
+        this.deckTwo = null;
+        this.deckThree = null;
+        this.deckFour = null;
     }
 
     @Test
@@ -131,34 +121,19 @@ class GameServiceTest extends TestRoot {
     void shouldSuccessfullyCreateAGame() {
         Game expectedGame = new Game();
         expectedGame.setParticipants(new ArrayList<>());
+
 //        Expected decks with new stats (Games played, game winner, win %)
-        Deck expectedDeckOne = new Deck(
-                DECK_ID_KALAMAX, KALAMAX, 1126,
-                15, 3, 67,
-                60, 2, 6,
-                10, new User()
-        );
+        Deck expectedDeckOne = new Deck(DECK_ID_KALAMAX, KALAMAX, 1126, 15, 3,
+                67, 60, 2, 6, 10, new User());
 
-        Deck expectedDeckTwo = new Deck(
-                DECK_ID_ANJE, ANJE, 1084,
-                15, 3, 33,
-                30, 1, 3,
-                10, new User()
-        );
+        Deck expectedDeckTwo = new Deck(DECK_ID_ANJE, ANJE, 1084, 15, 3,
+                33, 30, 1, 3, 10, new User());
 
-        Deck expectedDeckThree = new Deck(
-                DECK_ID_KENRITH, KENRITH, 1072,
-                15, 3, 33,
-                30, 1, 3,
-                10, new User()
-        );
+        Deck expectedDeckThree = new Deck(DECK_ID_KENRITH, KENRITH, 1072, 15, 3,
+                33, 30, 1, 3, 10, new User());
 
-        Deck expectedDeckFour = new Deck(
-                DECK_ID_OMNATH, OMNATH, 1067,
-                15, 3, 33,
-                30, 1, 3,
-                10, new User()
-        );
+        Deck expectedDeckFour = new Deck(DECK_ID_OMNATH, OMNATH, 1067, 15, 3,
+                33, 30, 1, 3, 10, new User());
 
         expectedGame.getParticipants().add(expectedDeckOne);
         expectedGame.getParticipants().add(expectedDeckTwo);

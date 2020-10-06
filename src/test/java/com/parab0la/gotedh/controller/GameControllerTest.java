@@ -61,6 +61,11 @@ class GameControllerTest extends TestRoot {
 
     @AfterEach
     void tearDown() {
+        this.gameDTO = null;
+        this.deckDTO = null;
+        this.deckDTOTwo = null;
+        this.deckDTOThree = null;
+        this.deckDTOFour = null;
     }
 
     @Test

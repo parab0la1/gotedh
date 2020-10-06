@@ -45,24 +45,15 @@ class DeckControllerTest extends TestRoot {
     void setUp() {
         this.user = new User(USER_ID, "Joel Nilsson", 1,
                 5, 56, 46, new HashSet<>());
-        this.deck = new Deck(
-                DECK_ID_KALAMAX, KALAMAX, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
-        this.deckTwo = new Deck(
-                2L, ANJE, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
-        this.deckThree = new Deck(
-                3L, KENRITH, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
+
+        this.deck = new Deck(DECK_ID_KALAMAX, KALAMAX, 1000, 15, 2,
+                50, 50, 1, 3, 7, new User());
+
+        this.deckTwo = new Deck(DECK_ID_ANJE, ANJE, 1000, 15, 2,
+                50, 50, 1, 3, 7, new User());
+
+        this.deckThree = new Deck(DECK_ID_KENRITH, KENRITH, 1000, 15, 2,
+                50, 50, 1, 3, 7, new User());
 
         this.decks = new ArrayList<>();
         this.decks.add(deck);
@@ -104,10 +95,8 @@ class DeckControllerTest extends TestRoot {
         DeckDTO emptyDeckInput = new DeckDTO();
         emptyDeckInput.setCommander(KALAMAX);
 
-        DeckDTO expectedDeckDTO = new DeckDTO(
-                1000, 0, 0,
-                0, 0, 0, 0
-        );
+        DeckDTO expectedDeckDTO = new DeckDTO(1000, 0, 0,
+                0, 0, 0, 0);
 
         expectedDeckDTO.setCommander(KALAMAX);
 
@@ -250,12 +239,8 @@ class DeckControllerTest extends TestRoot {
         DeckDTO newDeckDTO = new DeckDTO(1000,
                 15, 2, 50, 50, 3, 10);
 
-        Deck expectedDeck = new Deck(
-                DECK_ID_KALAMAX, KALAMAX, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                10, new User()
-        );
+        Deck expectedDeck = new Deck(DECK_ID_KALAMAX, KALAMAX, 1000, 15, 2,
+                50, 50, 1, 3, 10, new User());
 
         when(deckService.updateDeck(this.user.getUserId(), DECK_ID_KALAMAX, newDeckDTO.toDeck())).thenReturn(expectedDeck);
 

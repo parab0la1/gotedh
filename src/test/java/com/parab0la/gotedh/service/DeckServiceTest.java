@@ -44,24 +44,14 @@ class DeckServiceTest extends TestRoot {
         this.user = new User(USER_ID, "Joel Nilsson", 1,
                 5, 56, 46, new HashSet<>());
 
-        this.deck = new Deck(
-                DECK_ID_KALAMAX, KALAMAX, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
-        this.deckTwo = new Deck(
-                2L, ANJE, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
-        this.deckThree = new Deck(
-                3L, KENRITH, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                7, new User()
-        );
+        this.deck = new Deck(DECK_ID_KALAMAX, KALAMAX, 1000, 15, 2,
+                50, 50, 1, 3, 7, new User());
+
+        this.deckTwo = new Deck(DECK_ID_ANJE, ANJE, 1000, 15, 2,
+                50, 50, 1, 3, 7, new User());
+
+        this.deckThree = new Deck(DECK_ID_KENRITH, KENRITH, 1000, 15, 2,
+                50, 50, 1, 3, 7, new User());
 
         this.decks = new ArrayList<>();
         this.decks.add(deck);
@@ -214,22 +204,14 @@ class DeckServiceTest extends TestRoot {
 
     @Test
     void shouldSuccessfullyUpdateADeck() {
-        Deck newDeck = new Deck(
-                14124L, "Should not update", 1200,
-                17, 3, 40,
-                40, 2, 7,
-                14, this.user
-        );
-        Deck deckFromDB = new Deck(DECK_ID_KALAMAX, KALAMAX, 1000,
-                15, 2, 50,
-                50, 1, 3,
-                7, this.user
-        );
-        Deck expectedDeck = new Deck(DECK_ID_KALAMAX, KALAMAX, 1200,
-                17, 3, 40,
-                40, 2, 7,
-                14, this.user
-        );
+        Deck newDeck = new Deck(14124L, "Should not update", 1200, 17,
+                3, 40, 40, 2, 7, 14, this.user);
+
+        Deck deckFromDB = new Deck(DECK_ID_KALAMAX, KALAMAX, 1000, 15,
+                2, 50, 50, 1, 3, 7, this.user);
+
+        Deck expectedDeck = new Deck(DECK_ID_KALAMAX, KALAMAX, 1200, 17,
+                3, 40, 40, 2, 7, 14, this.user);
 
         when(userService.getUser(this.user.getUserId())).thenReturn(this.user);
         when(deckRepository.findByDeckIdAndOwner(deckFromDB.getDeckId(), this.user)).thenReturn(Optional.of(deckFromDB));

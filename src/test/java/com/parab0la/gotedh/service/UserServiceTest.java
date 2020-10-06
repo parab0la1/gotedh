@@ -35,9 +35,14 @@ class UserServiceTest extends TestRoot {
 
     @BeforeEach
     void setUp() {
-        this.user = new User(USER_ID_BRUCE_WAYNE, BRUCE_WAYNE, 1, 1, 1, 1, new HashSet<>());
-        this.userTwo = new User(USER_ID_HARVEY_DENT, HARVEY_DENT, 2, 2, 2, 2, new HashSet<>());
-        this.userThree = new User(USER_ID_ALFRED_PENNYWORTH, ALFRED_PENNYWORTH, 3, 3, 3, 3, new HashSet<>());
+        this.user = new User(USER_ID_BRUCE_WAYNE, BRUCE_WAYNE, 1, 1,
+                1, 1, new HashSet<>());
+
+        this.userTwo = new User(USER_ID_HARVEY_DENT, HARVEY_DENT, 2, 2,
+                2, 2, new HashSet<>());
+
+        this.userThree = new User(USER_ID_ALFRED_PENNYWORTH, ALFRED_PENNYWORTH, 3,
+                3, 3, 3, new HashSet<>());
 
         this.users = new ArrayList<>();
         this.users.add(user);
